@@ -14,21 +14,29 @@ def home():
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    # إنشاء لوحة أزرار تفاعلية
-    markup = types.InlineKeyboardMarkup()
-    btn1 = types.InlineKeyboardButton("اضغط هنا للتجربة", callback_data="test_btn")
-    markup.add(btn1)
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton("📊 الحساب والمحفظة")
+    btn2 = types.KeyboardButton("⛏️ بدء التعدين")
+    btn3 = types.KeyboardButton("👥 رابط الإحالة")
+    btn4 = types.KeyboardButton("💵 سحب الأرباح")
+    markup.add(btn1, btn2)
+    markup.add(btn3, btn4)
 
-    bot.reply_to(message, "أهلاً بكِ! البوت يعمل الآن على مدار الساعة. جربي الضغط على الزر أدناه:", reply_markup=markup)
+    bot.reply_to(message, "أهلاً بكِ! البوت يعمل الآن بشكل سحابي على مدار الساعة.", reply_markup=markup)
 
-# معالج نقرات الأزرار التفاعلية
-@bot.callback_query_handler(func=lambda call: True)
-def callback_handler(call):
-    if call.data == "test_btn":
-        # إظهار إشعار صغير للمستخدم عند الضغط
-        bot.answer_callback_query(call.id, "تم استلام ضغطتك بنجاح! 🎉")
-        # إرسال رسالة رد تفاعلية
-        bot.send_message(call.message.chat.id, "رائع جداً! الأزرار تعمل بكفاءة تامة الآن.")
+@bot.message_handler(func=lambda message: True)
+def handle_text(message):
+    text = message.text
+    if "الحساب والمحفظة" in text:
+        bot.reply_to(message, "📊 معلومات الحساب والمحفظة الخاصة بكِ:")
+    elif "بدء التعدين" in text:
+        bot.reply_to(message, "⛏️ جاري بدء عملية التعدين بنجاح...")
+    elif "رابط الإحالة" in text:
+        bot.reply_to(message, "👥 إليكِ رابط الإحالة الخاص بكِ لدعوة الأصدقاء:")
+    elif "سحب الأرباح" in text:
+        bot.reply_to(message, "💵 تم استلام طلب السحب بنجاح! قيد المعالجة للتحويل.")
+    else:
+        bot.reply_to(message, "الرجاء استخدام الأزرار أدناه للتفاعل مع البوت.")
 
 def run_bot():
     bot.remove_webhook()
