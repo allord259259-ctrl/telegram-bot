@@ -2,6 +2,7 @@ import os
 import telebot
 from flask import Flask
 import threading
+from telebot import types
 
 TOKEN = os.environ.get('BOT_TOKEN')
 bot = telebot.TeleBot(TOKEN)
@@ -13,10 +14,24 @@ def home():
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
-    bot.reply_to(message, "أهلاً بكِ! البوت يعمل الآن بشكل سحابي على مدار الساعة.")
+    # إنشاء لوحة أزرار تفاعلية
+    markup = types.InlineKeyboardMarkup()
+    btn1 = types.InlineKeyboardButton("اضغط هنا للتجربة", callback_data="test_btn")
+    markup.add(btn1)
+
+    bot.reply_to(message, "أهلاً بكِ! البوت يعمل الآن على مدار الساعة. جربي الضغط على الزر أدناه:", reply_markup=markup)
+
+# معالج نقرات الأزرار التفاعلية
+@bot.callback_query_handler(func=lambda call: True)
+def callback_handler(call):
+    if call.data == "test_btn":
+        # إظهار إشعار صغير للمستخدم عند الضغط
+        bot.answer_callback_query(call.id, "تم استلام ضغطتك بنجاح! 🎉")
+        # إرسال رسالة رد تفاعلية
+        bot.send_message(call.message.chat.id, "رائع جداً! الأزرار تعمل بكفاءة تامة الآن.")
 
 def run_bot():
-    bot.remove_webhook()  # مسح أي اتصال سابق لمنع تعارض 409
+    bot.remove_webhook()
     bot.infinity_polling()
 
 if __name__ == '__main__':
